@@ -1,6 +1,7 @@
 package com.board.QnA.member.entity;
 
 import com.board.QnA.audit.Auditable;
+import com.board.QnA.comment.entity.Comment;
 import com.board.QnA.question.entity.Question;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,8 +36,10 @@ public class Member extends Auditable {
     private List<String> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
-    private List<Question> Questions = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST)
+    private List<Comment> comments = new ArrayList<>();
     public enum MemberStatus{
         MEMBER_ACTIVE("활동중"), MEMBER_SLEEP("휴면 상태"), MEMBER_QUIT("탈퇴 상태");
         @Getter

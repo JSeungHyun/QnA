@@ -1,5 +1,6 @@
 package com.board.QnA.question.mapper;
 
+import com.board.QnA.question.dto.QuestionCommentResponseDto;
 import com.board.QnA.question.dto.QuestionPatchDto;
 import com.board.QnA.question.dto.QuestionPostDto;
 import com.board.QnA.question.dto.QuestionResponseDto;
@@ -17,6 +18,7 @@ public interface QuestionMapper {
     Question questionPatchDtoToQuestion(QuestionPatchDto questionPatchDto);
     @Mapping(source = "member.name",target = "name")
     QuestionResponseDto questionToResponseDto(Question question);
+    QuestionCommentResponseDto includeCommentToResponseDto(Question question);
     List<QuestionResponseDto> questionsToQuestionDtos(List<Question> questions);
 
 }

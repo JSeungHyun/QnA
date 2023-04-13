@@ -1,19 +1,28 @@
 package com.board.QnA.question.service;
 
+import com.board.QnA.comment.entity.Comment;
+import com.board.QnA.comment.repository.CommentRepository;
 import com.board.QnA.exception.BusinessLogicException;
 import com.board.QnA.exception.ExceptionCode;
 import com.board.QnA.member.entity.Member;
 import com.board.QnA.member.service.MemberService;
+import com.board.QnA.question.dto.QuestionCommentResponseDto;
 import com.board.QnA.question.entity.Question;
 import com.board.QnA.question.mapper.QuestionMapper;
 import com.board.QnA.question.repository.QuestionRepository;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Transactional
@@ -23,14 +32,18 @@ public class QuestionService {
     private String adminEmail;
     private final QuestionRepository questionRepository;
     private final MemberService memberService;
+    private final CommentRepository commentRepository;
 
-    public QuestionService(QuestionRepository questionRepository, MemberService memberService) {
+
+    public QuestionService(QuestionRepository questionRepository, MemberService memberService, CommentRepository commentRepository) {
         this.questionRepository = questionRepository;
         this.memberService = memberService;
+        this.commentRepository = commentRepository;
     }
 
     public Question createPost(Question question){
-        Member member = memberService.findVerifiedMember(question.getMember().getMemberId());
+        Map principal = (Map) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member member = memberService.findVerifiedMember((Long) principal.get("memberId"));
         question.getMember().setName(member.getName());
         question.setName(member.getName());
         if (question.getQuestionDisclosure() == null){
@@ -81,9 +94,16 @@ public class QuestionService {
             throw new BusinessLogicException(ExceptionCode.NO_PERMESSION);
         }
     }
-    private Question verifyQuestion(long questionId) {
+    public Question verifyQuestion(long questionId) {
         return questionRepository.findById(questionId).orElseThrow(
                 () -> new BusinessLogicException(ExceptionCode.POST_NOT_FOUND));
     }
-
+    public void findComment(QuestionCommentResponseDto dto, long questionId){
+        Question question = questionRepository.findById(questionId).orElseThrow(() -> new BusinessLogicException(ExceptionCode.POST_NOT_FOUND));
+        Comment comment = commentRepository.findById(question.getComment().getCommentId()).orElseThrow(() -> new BusinessLogicException(ExceptionCode.COMMENT_NOT_FOUND));
+        dto.setComment_id(comment.getCommentId());
+        dto.setCommentTime(comment.getModifiedAt());
+        dto.setCommentWriter(comment.getName());
+        dto.setCommentContent(comment.getContent());
+    }
 }

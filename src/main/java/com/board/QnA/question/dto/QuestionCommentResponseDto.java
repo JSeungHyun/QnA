@@ -6,10 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class QuestionResponseDto {
+public class QuestionCommentResponseDto {
     @Positive
     private long questionId;
     private String title;
@@ -17,5 +18,9 @@ public class QuestionResponseDto {
     private String name;
     private Question.QuestionDisclosure questionDisclosure;
     private Question.QuestionStatus questionStatus;
+    private long comment_id;
+    private String commentWriter;
+    private String commentContent;
+    private LocalDateTime commentTime;
 
 }

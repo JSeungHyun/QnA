@@ -7,7 +7,9 @@ public enum ExceptionCode {
     MEMBER_EXISTS(409, "Member exists"),
     POST_NOT_FOUND(404,"Post not found"),
     NO_PERMESSION(403, "You have no authority to order such an action"),
-    INVALID_MEMBER_STATUS(400, "Invalid member status");
+    INVALID_MEMBER_STATUS(400, "Invalid member status"),
+    COMMENT_NOT_FOUND(404,"Comment not found"),
+    ALREADY_COMPLETED(405,"Method Not Allowed");
 
     @Getter
     private int status;

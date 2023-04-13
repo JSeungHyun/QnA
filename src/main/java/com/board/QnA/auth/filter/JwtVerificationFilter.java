@@ -2,6 +2,8 @@ package com.board.QnA.auth.filter;
 
 import com.board.QnA.auth.jwt.JwtTokenizer;
 import com.board.QnA.auth.utils.CustomAuthorityUtils;
+import com.board.QnA.exception.BusinessLogicException;
+import com.board.QnA.exception.ExceptionCode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +46,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
     private void setAuthenticationToContext(Map<String,Object> claims){
         String username = (String) claims.get("username");
+        Object memberIdObj = claims.get("memberId");
+        Long memberId = memberIdObj != null ? ((Number) memberIdObj).longValue() : null;
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", username);
+        map.put("memberId", memberId);
+
         List<GrantedAuthority> authorityList = authorityUtils.createAuthorities((List)claims.get("roles"));
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorityList);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(map, null, authorityList);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
